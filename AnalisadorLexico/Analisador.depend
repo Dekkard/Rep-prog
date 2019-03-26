@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1553614851 source:c:\users\alunotgn\git\rep-prog\analisadorlexico\main.cpp
+	<iostream>
+	<string>
+	<fstream>
+
