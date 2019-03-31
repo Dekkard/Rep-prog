@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1553821496 source:/home/gustavo/Documentos/Rep-prog/AnalisadorLexicoU/main.cpp
+1554054211 source:/home/gustavo/Documentos/Rep-prog/AnalisadorLexicoU/main.cpp
 	<iostream>
 	<string>
 	<fstream>
