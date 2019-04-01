@@ -1,12 +1,14 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <stdlib.h>
 using namespace std;
 
 typedef string token;
 
-token lex_keywords[] = {"Program", "Var", "int", "real", "Const", "Begin", "Read", "Write", "End", "End." };
-token lex_symbols[] = {",", ";",":", "+", "-", "*", "/", "=", ":=","(",")"};
+token lex_keywords[] = {"Program", "Var", "int", "real", "Const", "Begin", "Read", "Write", "End", "End." ,""};
+token lex_symbols[] = {",", ";",":", "+", "-", "*", "/", "=", ":=","(",")",""};
+token lex_math_sym[] = {"+", "-", "*", "/",""};
 
 ifstream file;
 
@@ -21,22 +23,16 @@ typedef struct integer_Reg
 {
     string name;
     int value;
-    integer_Reg* prev;
-    integer_Reg* next;
 } integer_Reg;
 typedef struct float_Reg
 {
     string name;
     float value;
-    float_Reg* prev;
-    float_Reg* next;
 } float_Reg;
 typedef struct const_Reg
 {
     string name;
     int value;
-    const_Reg* prev;
-    const_Reg* next;
 } const_Reg;
 
 integer_Reg* iR;
@@ -69,7 +65,7 @@ void read_file()
 void string_lexing(token word)
 {
     int i = 0;
-    while(lex_keywords[i].compare(""))
+    while(!lex_keywords[i].empty())
     {
         if(word.compare(lex_keywords[i])==0)
         {
@@ -78,6 +74,11 @@ void string_lexing(token word)
             kw_it++;
             return;
         }
+        i++;
+    }
+    i=0;
+    while(!lex_symbols[i].empty())
+    {
         if(word.compare(lex_symbols[i])==0)
         {
             cout << word <<" -- Symbol found" << endl;
@@ -105,28 +106,77 @@ void string_lexing(token word)
 string string_id(token word)
 {
     int i = 0;
-    while(lex_keywords[i].compare(""))
+    while(!lex_keywords[i].empty())
     {
-        if(word.compare(lex_keywords[i])==0)
+        if(lex_keywords[i].compare(word)==0)
         {
             cout << word <<" -- keyword found" << endl;
             return "keyword";
         }
-        if(word.compare(lex_symbols[i])==0)
+        i++;
+    }
+    i=0;
+    while(!lex_symbols[i].empty())
+    {
+        if(lex_symbols[i].compare(word)==0)
         {
-            cout << word <<" -- Symbol found" << endl;
+            ///cout << word <<" -- Symbol found" << endl;
             return "symbol";
         }
         i++;
     }
     if(word.length() != 0)
     {
-        cout << word <<" -- Identifiers found" << endl;
+        ///cout << word <<" -- Identifiers found" << endl;
         return "identifier";
     }
     return NULL;
 }
-int find_id()
+
+string string_math(token word)
+{
+    int i = 0;
+    while(!lex_symbols[i].empty())
+    {
+        if(lex_math_sym[i].compare(word)==0)
+        {
+            return "math";
+        }
+        i++;
+    }
+}
+
+int find_reg_type(token word)
+{
+    int i=0;
+    while(!iR[i].name.empty())
+    {
+        if(word.compare(iR[i].name))
+        {
+            return 0;
+        }
+        i++;
+    }
+    i=0;
+    while(fR[i].name.empty())
+    {
+        if(word.compare(fR[i].name))
+        {
+            return 1;
+        }
+        i++;
+    }
+    i=0;
+    while(cR[i].name.empty())
+    {
+        if(word.compare(cR[i].name))
+        {
+            return 2;
+        }
+        i++;
+    }
+}
+
 int main(int argc, char **argv)
 {
     file.open (argv[1]);
@@ -140,9 +190,18 @@ int main(int argc, char **argv)
 
     string msg;
     token word;
-    //while(file != NULL)
+    //while(file7 != NULL)
     ///Fase 1: declaração de variáveis.
     int linha = 1;
+    /*while(true)
+    {
+        file >> word;
+        if(file.peek() == std::ifstream::traits_type::eof())
+        {
+            break;
+        }
+        string_lexing(word);
+    }*/
     while(true)
     {
         if(file.peek() == std::ifstream::traits_type::eof())
@@ -150,13 +209,13 @@ int main(int argc, char **argv)
             break;
         }
         file >> word;
-        if(word.compare("Program"))
+        if(word.compare("Program")==0)
         {
             file >> word;
-            if(string_id(word).compare("indentifier"))
+            if(string_id(word).compare("identifier")==0)
             {
                 file >> word;
-                if(word.compare(";"))
+                if(word.compare(";")==0)
                 {
                     linha++;
                 }
@@ -172,24 +231,24 @@ int main(int argc, char **argv)
                 return 0;
             }
         }
-        else if(word.compare("Var"))
+        else if(word.compare("Var")==0)
         {
             int i=0;
             string* reg;
             while(true)
             {
                 file >> word;
-                if(string_id(word).compare("indentifier"))
+                if(string_id(word).compare("identifier")==0)
                 {
-                    reg = new string[1];
+                    reg = new string;
                     reg[i] = word;
                     i++;
                     file >> word;
-                    if(word.compare(","))
+                    if(word.compare(",")==0)
                     {
                         continue;
                     }
-                    else if(word.compare(":"))
+                    else if(word.compare(":")==0)
                     {
                         break;
                     }
@@ -206,34 +265,23 @@ int main(int argc, char **argv)
                 }
             }
             file >> word;
-            if(word.compare("int"))
+            if(word.compare("int")==0)
             {
                 for(int j=0; j<i; j++)
                 {
-                    iR = new integer_Reg[1];
+                    iR = new integer_Reg;
                     iR[j].name = reg[j];
                     iR[j].value = NULL;
-                    iR[j].next = NULL;
-                    if(iR[j-1].name.compare(NULL))
-                    {
-                        iR[j].prev = &iR[j-1];
-                        iR[j-1].prev = &iR[j];
-                    }
                 }
                 delete reg;
             }
-            else if(word.compare("real"))
+            else if(word.compare("real")==0)
             {
                 for(int j=0; j<i; j++)
                 {
-                    fR = new float_Reg[1];
+                    fR = new float_Reg;
                     fR[j].name = reg[j];
-                    fR[j].next = NULL;
-                    if(iR[j-1].name.compare(NULL))
-                    {
-                        fR[j].prev = &fR[j-1];
-                        fR[j-1].prev = &fR[j];
-                    }
+                    fR[j].value = NULL;
                 }
                 delete reg;
             }
@@ -243,8 +291,9 @@ int main(int argc, char **argv)
                 return 0;
             }
             file >> word;
-            if(word.compare(";"))
+            if(word.compare(";")==0)
             {
+                delete reg;
                 linha++;
                 break;
             }
@@ -254,17 +303,17 @@ int main(int argc, char **argv)
                 return 0;
             }
         }
-        else if(word.compare("Const"))
+        else if(word.compare("Const")==0)
         {
             int i = 0;
             while(true)
             {
                 file >> word;
-                if(string_id(word).compare("identifier"))
+                if(string_id(word).compare("identifier")==0)
                 {
                     string name = word;
                     file >> word;
-                    if(word.compare("="))
+                    if(word.compare("=")==0)
                     {
                         file >> word;
                         for(int len=0; len<word.length(); len++)
@@ -279,22 +328,16 @@ int main(int argc, char **argv)
                                 return 0;
                             }
                         }
-                        cR = new const_Reg[1];
+                        cR = new const_Reg;
                         cR[i].name = name;
                         cR[i].value = stoi(word);
-                        cR[i].next = NULL;
-                        if(cR[i-1].name.compare(NULL))
-                        {
-                            cR[i].prev = &cR[i-1];
-                            cR[i-1].prev = &cR[i];
-                        }
                         i++;
                         file >> word;
-                        if(word.compare(","))
+                        if(word.compare(",")==0)
                         {
                             continue;
                         }
-                        if(word.compare(";"))
+                        if(word.compare(";")==0)
                         {
                             linha++;
                             break;
@@ -313,11 +356,12 @@ int main(int argc, char **argv)
                 }
             }
         }
-        else if(word.compare("Begin"))
+        else if(word.compare("Begin")==0)
         {
+            linha++;
             break;
         }
-        else if(string_id(word).compare("identifier"))
+        else if(string_id(word).compare("identifier")==0)
         {
             cout << "Erro: Comando não reconhecido: linha "<< linha << endl;
             return 0;
@@ -330,84 +374,190 @@ int main(int argc, char **argv)
         {
             break;
         }
-        if(word.compare("Read"))
+        if(word.compare("Read")==0)
         {
             file >> word;
-            if(word.compare("("))
+            if(word.compare("(")==0)
             {
                 file >> word;
-                int i = 0;
-                while(iR[i].next->name.compare(NULL) && fR[i].next->name.compare(NULL) && cR[i].next->name.compare(NULL) )
+                int reg_type = find_reg_type(word);
+                if(reg_type == 0)
                 {
-                    if(word.compare(iR[i].name))
+                    continue;
+                }
+                else if(reg_type == 1)
+                {
+                    continue;
+                }
+                else if(reg_type == 2)
+                {
+                    cout << "Erro: Valores constantes não podem ser mudados: linha "<< linha << endl;
+                    return 0;
+                }
+                else
+                {
+                    cout << "Erro: Identificador não declarado: linha "<< linha << endl;
+                    return 0;
+                }
+                file >> word;
+                if(word.compare(")")==0)
+                {
+                    file >> word;
+                    if(word.compare(";")==0)
                     {
-                        break;
+                        linha++;
                     }
-                    if(word.compare(fR[i].name))
+                    else
                     {
-                        break;
-                    }
-                    if(word.compare(cR[i].name))
-                    {
-                        cout << "Erro: Valores constantes não podem ser mudados: linha "<< linha << endl;
+                        cout << "Erro: Fim de linha não esperado: linha "<< linha << endl;
                         return 0;
                     }
-                    i++;
+                }
+                else
+                {
+                    cout << "Erro: Espera-se encerramento com parenteses: linha "<< linha << endl;
+                    return 0;
                 }
             }
+            else
+            {
+                cout << "Erro: Começo deve ser com parenteses: linha "<< linha << endl;
+                return 0;
+            }
         }
-        else if(word.compare("Write"))
+        else if(word.compare("Write")==0)
         {
             file >> word;
-            if(word.compare("("))
+            if(word.compare("(")==0)
             {
                 file >> word;
-                int i = 0;
-                while(iR[i].next->name.compare(NULL) && fR[i].next->name.compare(NULL) && cR[i].next->name.compare(NULL) )
+                int reg_type = find_reg_type(word);
+                if(reg_type == 0)
                 {
-                    if(word.compare(iR[i].name))
+                    continue;
+                }
+                else if(reg_type == 1)
+                {
+                    continue;
+                }
+                else if(reg_type == 2)
+                {
+                    continue;
+                }
+                else
+                {
+                    cout << "Erro: Identificador não declarado: linha "<< linha << endl;
+                    return 0;
+                }
+                file >> word;
+                if(word.compare(")")==0)
+                {
+                    file >> word;
+                    if(word.compare(";")==0)
                     {
-                        break;
+                        linha++;
                     }
-                    if(word.compare(fR[i].name))
+                    else
                     {
-                        break;
-                    }
-                    if(word.compare(cR[i].name))
-                    {
-                        cout << "Erro: Valores constantes não podem ser mudados: linha "<< linha << endl;
+                        cout << "Erro: Fim de linha não esperado: linha "<< linha << endl;
                         return 0;
                     }
-                    i++;
+                }
+                else
+                {
+                    cout << "Erro: Espera-se encerramento com parenteses: linha "<< linha << endl;
+                    return 0;
                 }
             }
-        }
-        else if(string_id(word).compare("identifier"))
-        {
-            while(iR[i].next->name.compare(NULL) && fR[i].next->name.compare(NULL) && cR[i].next->name.compare(NULL) )
+            else
             {
-                if(word.compare(iR[i].name))
-                {
-                    break;
-                }
-                if(word.compare(fR[i].name))
-                {
-                    break;
-                }
-                if(word.compare(cR[i].name))
-                {
-                    break;
-                }
-                i++;
+                cout << "Erro: Começo deve ser com parenteses: linha "<< linha << endl;
+                return 0;
+            }
+        }
+        else if(string_id(word).compare("identifier")==0)
+        {
+            int reg_type = find_reg_type(word);
+            if(reg_type == 0)
+            {
+                continue;
+            }
+            else if(reg_type == 1)
+            {
+                continue;
+            }
+            else if(reg_type == 2)
+            {
+                continue;
+            }
+            else
+            {
+                cout << "Erro: Identificador não declarado: linha "<< linha << endl;
+                return 0;
             }
             file >> word;
-            if(word.compare(":="))
+            if(word.compare(":=")==0)
             {
                 file >> word;
-
+                while(true)
+                {
+                    int reg_type = find_reg_type(word);
+                    if(reg_type == 0)
+                    {
+                        continue;
+                    }
+                    else if(reg_type == 1)
+                    {
+                        continue;
+                    }
+                    else if(reg_type == 2)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        cout << "Erro: Identificador não declarado: linha "<< linha << endl;
+                        return 0;
+                    }
+                    for(int len=0; len<word.length(); len++)
+                    {
+                        if(int(word[len]) >= 48 || int(word[len]) <= 57)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            cout << "Erro: valor deve ser numérico: linha "<< linha << endl;
+                            return 0;
+                        }
+                    }
+                    file >> word;
+                    if(!word.compare(";")==0)
+                    {
+                        if(string_math(word).compare("math")==0)
+                        {
+                            file >> word;
+                            if(word.compare(";")==0)
+                            {
+                                cout << "Erro: valor deve ser numérico: linha "<< linha << endl;
+                                return 0;
+                            }
+                        }
+                    }
+                    else if(word.compare(";")==0)
+                    {
+                        linha++;
+                        break;
+                    }
+                    else
+                    {
+                        cout << "Erro: valor deve ser numérico: linha "<< linha << endl;
+                        return 0;
+                    }
+                }
             }
         }
-        else if(word.compare("End."))
+        else if(word.compare("End.")==0)
         {
             break;
         }
