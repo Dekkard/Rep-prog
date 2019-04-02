@@ -1,8 +1,8 @@
 # Rep-prog
 Programa analisador léxico para a disciplina de compiladores do IFB
 ### Integrantes
-  Gustavo Rocha Flores
-  Virgilio Stefanin
+  * Gustavo Rocha Flores
+  * Virgilio Stefanin
 ### Compilando e executando
 Para executar o programa deve-se compila-lo:
 ```
