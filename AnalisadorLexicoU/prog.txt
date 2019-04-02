@@ -3,6 +3,6 @@ Var y , x : real ;
 Const A = 2 , B = 3 ;
 Begin
 Read  ( x ) ;
-y := a * x + b ;
+y := A * x + B ;
 Write ( y ) ;
 End.

@@ -6,7 +6,7 @@ using namespace std;
 
 typedef string token;
 
-token lex_keywords[] = {"Program", "Var", "int", "real", "Const", "Begin", "Read", "Write", "End", "End." ,""};
+token lex_keywords[] = {"Program", "Var", "int", "real", "Const", "Begin", "Read", "Write", "End", "End.",""};
 token lex_symbols[] = {",", ";",":", "+", "-", "*", "/", "=", ":=","(",")",""};
 token lex_math_sym[] = {"+", "-", "*", "/",""};
 
@@ -35,9 +35,9 @@ typedef struct const_Reg
     int value;
 } const_Reg;
 
-integer_Reg* iR;
-float_Reg* fR;
-const_Reg* cR;
+integer_Reg* iR = new integer_Reg;
+float_Reg* fR = new float_Reg;
+const_Reg* cR = new const_Reg;
 
 void read_file()
 {
@@ -110,7 +110,7 @@ string string_id(token word)
     {
         if(lex_keywords[i].compare(word)==0)
         {
-            cout << word <<" -- keyword found" << endl;
+            ///cout << word <<" -- keyword found" << endl;
             return "keyword";
         }
         i++;
@@ -151,25 +151,25 @@ int find_reg_type(token word)
     int i=0;
     while(!iR[i].name.empty())
     {
-        if(word.compare(iR[i].name))
+        if(word.compare(iR[i].name)==0)
         {
             return 0;
         }
         i++;
     }
     i=0;
-    while(fR[i].name.empty())
+    while(!fR[i].name.empty())
     {
-        if(word.compare(fR[i].name))
+        if(word.compare(fR[i].name)==0)
         {
             return 1;
         }
         i++;
     }
     i=0;
-    while(cR[i].name.empty())
+    while(!cR[i].name.empty())
     {
-        if(word.compare(cR[i].name))
+        if(word.compare(cR[i].name)==0)
         {
             return 2;
         }
@@ -233,15 +233,24 @@ int main(int argc, char **argv)
         }
         else if(word.compare("Var")==0)
         {
-            int i=0;
-            string* reg;
+            string* reg = new string;
+            string* reg_aux;
+            int i = 0;
             while(true)
             {
                 file >> word;
                 if(string_id(word).compare("identifier")==0)
                 {
-                    reg = new string;
-                    reg[i] = word;
+                    int j = 0;
+                    reg_aux = new string[sizeof(string)*(i+1)];
+                    reg_aux[i] = word;
+                    while(!reg[j].empty())
+                    {
+                        reg_aux[j] = reg[j];
+                        j++;
+                    }
+                    //delete [] reg;
+                    reg = reg_aux;
                     i++;
                     file >> word;
                     if(word.compare(",")==0)
@@ -267,23 +276,25 @@ int main(int argc, char **argv)
             file >> word;
             if(word.compare("int")==0)
             {
+                iR = new integer_Reg[sizeof(integer_Reg)*(i+1)];
                 for(int j=0; j<i; j++)
                 {
-                    iR = new integer_Reg;
                     iR[j].name = reg[j];
                     iR[j].value = NULL;
                 }
-                delete reg;
+                delete [] reg;
+                //delete [] reg_aux;
             }
             else if(word.compare("real")==0)
             {
+                fR = new float_Reg[sizeof(float_Reg)*(i+1)];
                 for(int j=0; j<i; j++)
                 {
-                    fR = new float_Reg;
                     fR[j].name = reg[j];
                     fR[j].value = NULL;
                 }
-                delete reg;
+                delete [] reg;
+                //delete [] reg_aux;
             }
             else
             {
@@ -293,9 +304,7 @@ int main(int argc, char **argv)
             file >> word;
             if(word.compare(";")==0)
             {
-                delete reg;
                 linha++;
-                break;
             }
             else
             {
@@ -306,6 +315,8 @@ int main(int argc, char **argv)
         else if(word.compare("Const")==0)
         {
             int i = 0;
+            const_Reg* cR_aux;
+            const_Reg* reg = new const_Reg;
             while(true)
             {
                 file >> word;
@@ -328,9 +339,16 @@ int main(int argc, char **argv)
                                 return 0;
                             }
                         }
-                        cR = new const_Reg;
-                        cR[i].name = name;
-                        cR[i].value = stoi(word);
+                        cR_aux = new const_Reg[sizeof(const_Reg)*(i+1)];
+                        cR_aux[i].name = name;
+                        cR_aux[i].value = stoi(word);
+                        int j=0;
+                        while(!reg[j].name.empty())
+                        {
+                            cR_aux[j] = reg[j];
+                            j++;
+                        }
+                        reg = cR_aux;
                         i++;
                         file >> word;
                         if(word.compare(",")==0)
@@ -339,6 +357,28 @@ int main(int argc, char **argv)
                         }
                         if(word.compare(";")==0)
                         {
+                            if(!cR[0].name.empty()){
+                                cR_aux = cR;
+                                cR = new const_Reg[sizeof(const_Reg)*(i+1)];
+                                int j=0;
+                                while(!cR_aux[j].name.empty())
+                                {
+                                    cR[j] = cR_aux[j];
+                                }
+                                for(j=0;j<i;j++)
+                                {
+                                    cR[j+i] = reg[j];
+                                }
+                            }
+                            else
+                            {
+                                cR = new const_Reg[sizeof(const_Reg)*(i+1)];
+                                for(j=0;j<i;j++)
+                                {
+                                    cR[j] = reg[j];
+                                }
+                            }
+                            delete [] reg;
                             linha++;
                             break;
                         }
@@ -374,6 +414,7 @@ int main(int argc, char **argv)
         {
             break;
         }
+        file >> word;
         if(word.compare("Read")==0)
         {
             file >> word;
@@ -383,11 +424,11 @@ int main(int argc, char **argv)
                 int reg_type = find_reg_type(word);
                 if(reg_type == 0)
                 {
-                    continue;
+
                 }
                 else if(reg_type == 1)
                 {
-                    continue;
+
                 }
                 else if(reg_type == 2)
                 {
@@ -434,15 +475,15 @@ int main(int argc, char **argv)
                 int reg_type = find_reg_type(word);
                 if(reg_type == 0)
                 {
-                    continue;
+                    //continue;
                 }
                 else if(reg_type == 1)
                 {
-                    continue;
+                    //continue;
                 }
                 else if(reg_type == 2)
                 {
-                    continue;
+                    //continue;
                 }
                 else
                 {
@@ -480,15 +521,15 @@ int main(int argc, char **argv)
             int reg_type = find_reg_type(word);
             if(reg_type == 0)
             {
-                continue;
+                //continue;
             }
             else if(reg_type == 1)
             {
-                continue;
+                //continue;
             }
             else if(reg_type == 2)
             {
-                continue;
+                //continue;
             }
             else
             {
@@ -504,15 +545,15 @@ int main(int argc, char **argv)
                     int reg_type = find_reg_type(word);
                     if(reg_type == 0)
                     {
-                        continue;
+                        //continue;
                     }
                     else if(reg_type == 1)
                     {
-                        continue;
+                        //continue;
                     }
                     else if(reg_type == 2)
                     {
-                        continue;
+                        //continue;
                     }
                     else
                     {
@@ -523,7 +564,7 @@ int main(int argc, char **argv)
                     {
                         if(int(word[len]) >= 48 || int(word[len]) <= 57)
                         {
-                            continue;
+                            //continue;
                         }
                         else
                         {
@@ -559,6 +600,8 @@ int main(int argc, char **argv)
         }
         else if(word.compare("End.")==0)
         {
+            //linha++;
+            cout << "...nenhuma falha encontrada em "<<linha<<" linha(s)..."<<endl;
             break;
         }
     }
