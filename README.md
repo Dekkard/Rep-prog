@@ -12,5 +12,9 @@ Ao compilar, execute o arquivo, passando como argumento o arquivo a ser analisad
 ```
 ./main prog.txt
 ```
+Para deleter os arquivos *.o
+```
+make clean
+```
 ### Aviso
 Programa testado e compilado em ambiente Linux
