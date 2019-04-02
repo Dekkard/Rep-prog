@@ -12,3 +12,5 @@ Ao compilar, execute o arquivo, passando como argumento o arquivo a ser analisad
 ```
 ./main prog.txt
 ```
+### Aviso
+Programa testado e compilado em ambiente Linux
