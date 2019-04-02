@@ -1,7 +1,0 @@
-# depslib dependency file v1.0
-1554167605 source:/home/gustavo/Documentos/Rep-prog/AnalisadorLexicoU/main.cpp
-	<iostream>
-	<string>
-	<fstream>
-	<stdlib.h>
-
