@@ -1,1 +1,11 @@
 # Rep-prog
+Programa analisador léxico para a disciplina de compiladores do IFB
+### Compilando e executando
+Para executar o programa deve-se compila-lo:
+```
+g++ -o main main.cpp
+```
+Ao compilar, execute o arquivo, passando como argumento o arquivo a ser analisado:
+```
+./main prog.txt
+```
