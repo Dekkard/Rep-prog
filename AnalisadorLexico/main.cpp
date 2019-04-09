@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <stdlib.h>
+#include <regex>
 using namespace std;
 
 typedef string token;
@@ -9,6 +10,11 @@ typedef string token;
 token lex_keywords[] = {"Program", "Var", "int", "real", "Const", "Begin", "Read", "Write", "End", "End.",""};
 token lex_symbols[] = {",", ";",":", "+", "-", "*", "/", "=", ":=","(",")",""};
 token lex_math_sym[] = {"+", "-", "*", "/",""};
+
+//regex reg_real("[0-9]*,[0-9]+([Ee][-+]?[0-9]+)|[0-9]*,[0-9]+");
+//regex regex_keyword("Program|Var|int|real|Const|Begin|Read|Write|(End.)|End");
+//regex regex_symbols (",|:|;|:=|=|\(|\)|\|");
+//regex regex_math_sym("+|-|*|/");
 
 ifstream file;
 
@@ -127,6 +133,13 @@ string string_id(token word)
     }
     if(word.length() != 0)
     {
+		for(i=0;i<word.length();i++)
+		{
+			if( (int(word[i]) < 41 and int(word[i])>90) or (int(word[i]) < 97 and int(word[i]) > 122) )
+			{
+				return NULL;
+			}
+		}
         ///cout << word <<" -- Identifiers found" << endl;
         return "identifier";
     }
