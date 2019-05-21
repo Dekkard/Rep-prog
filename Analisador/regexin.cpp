@@ -7,12 +7,15 @@ using namespace std;
 
 typedef string token;
 
-regex reg_real("[0-9]+,[0-9]+([Ee][-+]?[0-9]+)|[0-9]+,[0-9]+|[0-9]+");
-regex regex_keyword("(Program|Var|int|real|Const|Begin|Read|Write|(End.)|End)");
-regex regex_symbols ("(?![0-9]),(?![0-9])|:|;|:=|=|[(]|[)]|[+]|[-]|[*]|[/]|[\"]");
+regex regex_real("[0-9]+,[0-9]+([Ee][-+]?[0-9]+)|[0-9]+,[0-9]+");
+regex regex_int("[0-9]+");
+//regex regex_keyword("(Program|Var|int|real|Const|Begin|Read|Write|(End.)|End)");
+regex regex_keyword("if|else|while|return|float|char|void|print|int|and|or|not|proc|var");
+regex regex_symbols ("(?![0-9]),(?![0-9])|:=|:|;|=|[(]|[)]|[+]|[-]|[*]|[/]|[\"]");
+regex regex_id("\b[a-z]([a-zA-Z]|[0-9])*");
 //regex regex_math_sym("\+|-|\*|\/");
 
-void printMatch(string var, regex reg){
+void printMatch(string var, regex reg, string type){
     smatch match;
     while(regex_search(var,match,reg))
         {
@@ -20,14 +23,18 @@ void printMatch(string var, regex reg){
             var = match.suffix().str();
         }
 }
-void printMatch2(string var, regex reg){
+void printMatch2(string var, regex reg, string type){
     sregex_iterator currentMatch(var.begin(),var.end(),reg);
     sregex_iterator lastMatch;
     while(currentMatch != lastMatch)
     {
         smatch match = *currentMatch;
-        cout << "Match: " << match.str() << " -- Position: " << match.position() << endl;
-        currentMatch++;
+        cout << "Match: " << match.str() << " -- Position: "
+		<< match.position()<<" -- length: "<< match.length()
+		<<" -- Type: "<< type << endl;
+	var.erase(match.position(),match.length());
+	cout << var << endl;
+	currentMatch++;
     }
 }
 
@@ -59,9 +66,10 @@ int main()
         {
             break;
         }
-        printMatch2(var,regex_keyword);
-        printMatch2(var,reg_real);
-        //printMatch2(var,regex_math_sym);
-        printMatch2(var,regex_symbols);
+        printMatch2(var,regex_keyword,"keyword");
+        printMatch2(var,regex_real,"real");
+        printMatch2(var,regex_int,"int");
+        printMatch2(var,regex_symbols,"symbol");
+	printMatch2(var,regex_id,"id");
     }
 }
