@@ -7,9 +7,9 @@ using namespace std;
 
 typedef string token;
 
-regex reg_real("[0-9]*,[0-9]+([Ee][-+]?[0-9]+)|[0-9]*,[0-9]+|[0-9]+");
+regex reg_real("[0-9]+,[0-9]+([Ee][-+]?[0-9]+)|[0-9]+,[0-9]+|[0-9]+");
 regex regex_keyword("(Program|Var|int|real|Const|Begin|Read|Write|(End.)|End)");
-regex regex_symbols (",|:|;|:=|=|[(]|[)]|[+]|[-]|[*]|[/]|[\"]");
+regex regex_symbols ("(?![0-9]),(?![0-9])|:|;|:=|=|[(]|[)]|[+]|[-]|[*]|[/]|[\"]");
 //regex regex_math_sym("\+|-|\*|\/");
 
 void printMatch(string var, regex reg){
