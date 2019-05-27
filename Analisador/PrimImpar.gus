@@ -1,0 +1,25 @@
+var n, soma - int;
+
+proc main()
+{
+	var result - int;
+
+	result := soma(9)primeirosImpares();
+
+	prnt(result);
+}
+proc soma(n -int)primeirosImpares() - int
+{
+	var i, proxImpar, resultado - int;
+
+	resultado := 0;
+	i := 0;
+
+	while(i<n){
+		proxImpar := 2*i +1;   ** o i-esimo impar positivo
+		resultado := resultado + proxImpar;
+		i := i+i;
+	}
+
+	return resultado;
+}
