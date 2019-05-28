@@ -11,7 +11,7 @@ using namespace std;
 regex regex_number("\\b[0-9]*,?[0-9]*(([Ee][-+])?[0-9]+)\\b");
 //regex regex_keyword("(Program|Var|int|real|Const|Begin|Read|Write|(End.)|End)");
 regex regex_keyword("\\b(if|else|while|return|float|char|void|prnt|int|and|or|not|proc|var|main)\\b");
-regex regex_symbols ("(?![0-9]),(?![0-9])|:=|:|;|=|[(]|[)]|[+]|[-]|<<|>>|\\*\\*|[*]|[/]|[\"]|[{]|[}]");
+regex regex_symbols ("(?![0-9]),(?![0-9])|!=|==|>=|<=|<|>|:=|:|;|=|[(]|[)]|[+]|[-]|<<|>>|\\*\\*|[*]|[/]|[\"]|[{]|[}]");
 regex regex_id("[a-z]([a-zA-z0-9])*");
 regex regex_string("['][a-zA-Z0-9]+[']");
 //regex regex_math_sym("\+|-|\*|\/");
@@ -71,9 +71,7 @@ int main(int argc, char **argv)
 	file.clear();
 	file.seekg(0,ios::beg);
     cout << "Começo da Analise...\n" << endl;
-	//token **Program;
-	vector<vector<token>> Program;
-	Program.resize(rows);
+	token *Program[rows];
 	int li = 0;
     while(getline(file, line))
     {
@@ -96,35 +94,19 @@ int main(int argc, char **argv)
 				j++;
 			}
 		}
-		Program[li].resize(sizeof(lines));
-		int i=0;
-		while(lines[i].value.empty()){
-			Program[li][i] = lines[i++];}
-		/*token **Program_aux = new token*[sizeof(token)*(li+1)];
-		Program_aux[li] = lines;
-		int k=0;
-		while(!Program[k][0].value.empty()){
-			int l=0;
-			while(!Program[k][0].value.empty()){
-				cout << Program[k][l].value << endl;
-				Program_aux[k][l] = Program[k][l];
-				l++;}
-			k++;
-		}
-		Program = Program_aux;*/
+		Program[li] = lines;
 		//cout << "" << endl;
 		li++;
-		//Program[li] = new token;
     }
 	cout << "...fim da analise." << endl;
     file.close();
-	int i=0,j=0;
-	for ( vector<vector<token>>::iterator it1 = Program.begin(); it1 != Program.end(); ++it1 )
-	{
-		for ( vector<vector<token>>::iterator it2 = (*it1).begin(); it2 != (*it1).end(); ++ it2 )
-		{
-			std::cout << (*it2) << "\n"; // print the strings
+	for(int i=0;i<rows;i++){
+		int j=0;
+		cout << "Linha "<<i+1<<": ";
+		while(!Program[i][j].value.empty()){
+			cout << Program[i][j++].value << " ";
 		}
+		cout << "" << endl;
 	}
 	return 0;
 }
