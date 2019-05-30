@@ -3,9 +3,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <regex>
-#include <iterator>
-#include <vector>
-#include <algorithm>
+
 using namespace std;
 
 regex regex_number("\\b[0-9]*,?[0-9]*(([Ee][-+])?[0-9]+)\\b");
@@ -123,8 +121,7 @@ token** Lex(string filename, int &rows){
 	ifstream file;
 	file.open (filename);
     if (!file.is_open()){
-        cout << "Arquivo não encontrado." << endl;
-        return 0;
+        return NULL;
     }
 	string line;
 	/*int*/ rows = 0;
@@ -134,7 +131,7 @@ token** Lex(string filename, int &rows){
 	cout << rows << endl;
 	file.clear();
 	file.seekg(0,ios::beg);
-    cout << "Começo da Analise... ";
+    //cout << "Começo da Analise... ";
 	//token *Program[rows];
 	token **Program = new token*[sizeof(token)*rows];
 	int li = 0;
@@ -162,7 +159,7 @@ token** Lex(string filename, int &rows){
 		//cout << "" << endl;
 		li++;
     }
-	cout << "...fim da analise." << endl;
+	//cout << "...fim da analise." << endl;
     file.close();
 	return Program;
 }
@@ -178,10 +175,13 @@ void printProg(token** Program, int rows){
 }
 int main(int argc, char **argv)
 {	
+	if(argv[1] == 0){
+		cout << "Arquivo não encontrado." << endl;
+		return 0;}
 	reset_bc();
-	string filename = argv[1];
+	string file = argv[1];
 	int rows;
-	token **Program = Lex(filename,rows);
+	token **Program = Lex(file,rows);
     printProg(Program,rows);
 	return 0;
 }
