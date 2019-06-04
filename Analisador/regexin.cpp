@@ -4,20 +4,17 @@
 #include <stdlib.h>
 #include <regex>
 
+#include "libAux.hpp"
+
 using namespace std;
 
 regex regex_number("\\b[0-9]*,?[0-9]*(([Ee][-+])?[0-9]+)\\b");
 regex regex_keyword("\\b(if|else|while|return|float|char|void|prnt|int|and|or|not|proc|var|main)\\b");
-regex regex_symbols ("(?![0-9]),(?![0-9])|\\*\\*|<<|>>|!=|==|>=|<=|<|>|:=|:|;|=|[(]|[)]|[+]|[-]|[*]|[/]|[\"]|[{]|[}]");
+regex regex_symbols ("(?![0-9]),(?![0-9])|\\*\\*|<<|>>|!=|==|>=|<=|<|>|:=|:|;|=|[(]|[)]|[\"]|[{]|[}]");
+regex regex_math("[+]|[-]|[*]|[/]");
 regex regex_id("[a-z]([a-zA-z0-9])*");
 regex regex_string("['][a-zA-Z0-9]+[']");
 
-typedef struct token{
-	std::string value;
-	std::string type;
-	int len;
-	int pos;
-} token;
 typedef struct posLine{
 	int pos;
 	int line;
@@ -96,6 +93,7 @@ void printMatch_helper(token* lines, string line, regex reg, string type, int li
 		aux.type = type;
 		aux.len = match.length();
 		aux.pos = match.position();
+		if(match.str().compare(":=")==0){ aux.type+="_att";}
 		lines[match.position()] = aux;
         //cout <<"-"<< match.str() <<"-(pos:"<< match.position() << "," << type << ") ";
 		currentMatch++;
@@ -104,6 +102,7 @@ void printMatch_helper(token* lines, string line, regex reg, string type, int li
 token* printMatch(string line,int li){
 	token *lines = new token[sizeof(token)*line.length()];
 	printMatch_helper(lines,line,regex_symbols,"sym", li);
+	printMatch_helper(lines,line,regex_math,"math", li);
 	printMatch_helper(lines,line,regex_keyword,"key", li);
 	printMatch_helper(lines,line,regex_number,"num", li);
 	printMatch_helper(lines,line,regex_id,"id", li);
@@ -128,7 +127,7 @@ token** Lex(string filename, int &rows){
 	while(getline(file, line)){
 		rows++;
 	}
-	cout << rows << endl;
+	//cout << rows << endl;
 	file.clear();
 	file.seekg(0,ios::beg);
     //cout << "Começo da Analise... ";
@@ -173,15 +172,29 @@ void printProg(token** Program, int rows){
 		cout << "" << endl;
 	}
 }
+//regex parser_
+void Parse(token **Program, int rows){
+	token *tokens;
+	string line[rows];
+	for(int li=0; li<rows;li++){
+		tokens = Program[li];
+		int i = 0;
+		while(!tokens[i].value.empty()){
+			line[li] += tokens[i++].type;
+			line[li] += " ";
+		}
+		cout <<li+1<<": "<< line[li] << endl;
+	}
+}
 int main(int argc, char **argv)
-{	
+{
 	if(argv[1] == 0){
 		cout << "Arquivo não encontrado." << endl;
 		return 0;}
 	reset_bc();
-	string file = argv[1];
 	int rows;
-	token **Program = Lex(file,rows);
-    printProg(Program,rows);
+	token **Program = Lex(argv[1],rows);
+	Parse(Program,rows);
+    //printProg(Program,rows);
 	return 0;
 }
