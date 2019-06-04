@@ -2,7 +2,7 @@ proc main()
 {
 	var n,nRebuilt-int;
 
-	n := 51423; ** numero a ser testado
+	n := 51423;** numero a ser testado
 
 	>> A divisao de interiro arredonda para baixo (em caso
 		de divisao inexata). Assim, numeros impares ficarao

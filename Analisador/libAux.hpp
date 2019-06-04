@@ -12,7 +12,7 @@ typedef struct token{
 } token;
 
 typedef struct node{
-    token data;
+    token word;
     node* left;
     node* right;
 } node;

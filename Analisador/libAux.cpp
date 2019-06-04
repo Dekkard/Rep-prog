@@ -6,12 +6,12 @@
 
 using namespace std;
 
-node* createNode(token data){
+node* createNode(token word){
 	node* node = new node;
-	node.data = data;
+	node.word = data;
 	node->left = NULL;
 	node->right = NULL;
-	return node;s
+	return node;
 }
 
 node* turnLeft(node* node1){
@@ -50,7 +50,44 @@ node* deleteNode(node* node){
 		//TO_DO
 	}
 }
-node* setTree_helper(token* word, int i){
+node* setTree2(node* root){
+	node* ite = root;
+	while(!ite->right.word.value.empty()){
+		if(ite.word.type.compare("id")){
+			if(ite.word.type.compare("sym_att")){
+				ite = leftTurn(ite); 
+			}
+		}
+	}
+}
+node* tree_setup(token* line){
+	node* root;
+	node* ite = root;
+	int i=0;
+	int counter = 0;
+	int* counterPos;
+	while(!line[i].value.empty()){
+		if(token.value.compare("(")==0){
+			counter++;
+			int* aux = new int[counter+1];
+			aux = 
+			int j=0;
+			while(!counterPos.empty()) { aux[j]=counterPos[j++]; }
+			counterPos = aux;
+		}
+		if(token.value.compare(")")==0){
+			counter--;
+			int j=0;
+			while(!counterPos.empty()) { j++; }
+			delete counterPos[j];
+		}
+		ite.token = createNode(line[i++]);
+		ite = ite->right;
+	}
+	delete counterPos;
+	return root;
+}
+/*node* setTree_helper(token* word, int i){
 	node ite;
 	if(token.type.compare("id")==0 || token.type.compare("num")==0){
 		ite->right = createNode(line[++]);
@@ -85,4 +122,4 @@ node* setTree(token* line){
 		}
 	}
 	return root
-}
+}*/

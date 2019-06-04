@@ -74,7 +74,7 @@ void printMatch_helper(token* lines, string line, regex reg, string type, int li
 			}
 		}
 		if(lineComment.status == 'S'){
-			if(match.position() > lineComment.pos){
+			if(match.position() >= lineComment.pos){
 				currentMatch++;
 				continue;
 			}
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
 	reset_bc();
 	int rows;
 	token **Program = Lex(argv[1],rows);
-	Parse(Program,rows);
-    //printProg(Program,rows);
+	//Parse(Program,rows);
+    printProg(Program,rows);
 	return 0;
 }
