@@ -50,39 +50,54 @@ node* deleteNode(node* node){
 		//TO_DO
 	}
 }
+node* setTree2_helper(node* node){}
 node* setTree2(node* root){
 	node* ite = root;
+	node* simlist;
 	while(!ite->right.word.value.empty()){
 		if(ite.word.type.compare("id")){
 			if(ite.word.type.compare("sym_att")){
-				ite = leftTurn(ite); 
+				ite = leftTurn(ite);
+			}
+			if(ite.word.value.compare("(")==0){
+				node* 
 			}
 		}
 	}
 }
-node* tree_setup(token* line){
+node* tree_setup(token* line, int row){
 	node* root;
 	node* ite = root;
 	int i=0;
-	int counter = 0;
-	int* counterPos;
+	node* counterPos;
 	while(!line[i].value.empty()){
-		if(token.value.compare("(")==0){
-			counter++;
-			int* aux = new int[counter+1];
-			aux = 
-			int j=0;
-			while(!counterPos.empty()) { aux[j]=counterPos[j++]; }
-			counterPos = aux;
+		ite = createNode(line[i++]);
+		if(ite.token.value.compare("(")==0){
+			node* counter = createNode(ite.token);
+			if(counterPos.token.value.empty()){
+				counterPos = counter;
+			}
+			else if(counterPos->right == NULL){
+				counterPos->right = counter;
+				counter->left = counterPos;
+				counterPos = counterPos->right;
+			}
 		}
 		if(token.value.compare(")")==0){
-			counter--;
-			int j=0;
-			while(!counterPos.empty()) { j++; }
-			delete counterPos[j];
+			if(counterPos->left == NULL){
+				delete counterPos;
+			}else{
+				node* temp = counterPos;
+				counterPos = counterPos->left;
+				counterPos->right = NULL;
+				delete temp;
+			}
 		}
-		ite.token = createNode(line[i++]);
 		ite = ite->right;
+	}
+	if(!counterPos.token.value.empty()){
+		cout << "Parenteses a esquerda sem fechamento, linha: "<< row << ", "<< counterPos.word.pos << endl; 
+		exit(1);
 	}
 	delete counterPos;
 	return root;
