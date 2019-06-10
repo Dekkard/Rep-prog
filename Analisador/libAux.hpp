@@ -10,14 +10,12 @@ typedef struct token{
 	int len;
 	int pos;
 } token;
-
 typedef struct node{
     token word;
     node* left;
     node* right;
 } node;
-
 node* createNode(token data);
 node* turnLeft(node* node1);
 node* turnRight(node* node1);
-node* setTree(token* line);
+node* tree_setup(token* line, int row);

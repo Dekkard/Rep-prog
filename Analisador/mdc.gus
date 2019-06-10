@@ -1,28 +1,28 @@
-proc main()
-{
-	var x, y - int;
-	var m - int;
-
-	x := 120; >> dois valores a partir dos quais <<
-	y := 640  >> sera calculado o m.d.c.         <<
-
-	m:= mdcDe (x) e (y);
-
-	prnt('m','d', 'c', '(');
-	prnt(x);
-    prnt(',');
-	prnt(y);
-	prnt(')',':');
-	prnt(m);
-
-}
-
 proc mdcDe(x - int)e(y - int) - int
 {
 	if(y=0){
 		return x;
 	}else{
-		return mdcD(y)e(x(x%y);
+		return mdcDe(y)e(x%y);
 	}
+
+}
+
+proc main()
+{
+	var x,y-int;
+	var m-int;
+
+	x := 120; >> dois valores a partir dos quais <<
+	y := 640; >> sera calculado o m.d.c.         <<
+
+	m:= mdcDe (x) e (y);
+
+	prnt('m','d','c','(');
+	prnt(x);
+    prnt(',');
+	prnt(y);
+	prnt(')',':');
+	prnt(m);
 
 }

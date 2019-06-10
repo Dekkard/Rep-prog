@@ -41,26 +41,98 @@ node* deleteNode(node* node){
 		delete node;
 		return temp;
 	}
-	if(node->left == NULL && node->right != NULL){
+	else if(node->left == NULL && node->right != NULL){
 		node* temp = node->right;
 		delete node;
 		return temp;
 	}
-	if(node->left != NULL && node->right != NULL){
+	else if(node->left != NULL && node->right != NULL){
 		//TO_DO
 	}
+	else{
+		delete node;
+		return NULL;
+	}
 }
-node* setTree2_helper(node* node){}
-node* setTree2(node* root){
+void setTree2_helper(node* node){
+	ite = node;
+	while(!ite->right.word.value.empty()){
+		if(ite.type.compare("id")==0 || ite.type.compare("num")==0){
+			if(ite->right.type.compare("sym_math")==0){
+				ite = turnleft(ite);
+			}
+		}
+		if(ite->right.word.value.compare("(")==0){
+			ite->right = deleteNode(ite->right);
+			node* branch,branch_ite;
+			branch_ite = branch;
+			while(true){
+				if(ite->right.word.value.comapre(")")==0){
+					ite->right = deleteNode(ite->right);
+					break;
+				}else{
+					branch_ite = createNode(ite->right.word);
+					branch_ite = branch_ite->right;
+					ite->right = deleteNode(ite->right);
+				}
+			}
+			setTree2_helper(branch);
+			ite->right->left = branch;
+		}
+		if(ite.type.compare("sym_math")==0){
+			if(ite->right.type.compare("id")==0 || ite.type.compare("num")==0){
+				if(ite->right->right.type.compare("sym_math")==0){
+					ite->right = turnleft(ite->right);
+					if(regex_match(ite.value,"[/]|[*]|%") && regex_match(ite->right.value,"[-]|[+]")){
+						ite = turnleft(ite);
+					}else{
+						ite = ite->right;
+					}
+				}
+			}
+		}
+	}
+}
+void setTree2(node* root){
 	node* ite = root;
 	node* simlist;
-	while(!ite->right.word.value.empty()){
-		if(ite.word.type.compare("id")){
-			if(ite.word.type.compare("sym_att")){
-				ite = leftTurn(ite);
+	if(ite.word.type.compare("id") || ite.word.value.compare("return")){
+		while(!ite->right.word.value.empty()){
+			if(ite->right.word.type.compare("sym_att") && !ite.word.value.compare("return")){
+				ite = turnleft(ite);
 			}
-			if(ite.word.value.compare("(")==0){
-				node* 
+			if(ite->right.word.value.compare("(")==0){
+				ite->right = deleteNode(ite->right);
+				node* branch,branch_ite;
+				branch_ite = branch;
+				while(true){
+					if(ite->right.word.value.comapre(")")==0){
+						ite->right = deleteNode(ite->right);
+						break;
+					}else{
+						branch_ite = createNode(ite->right.word);
+						branch_ite = branch_ite->right;
+						ite->right = deleteNode(ite->right);
+					}
+				}
+				setTree2_helper(branch);
+				ite->right->left = branch;
+			}
+			if(ite->right.type.compare("sym_math")==0){
+				ite = ite->right;
+				if(ite->right.type.compare("id")==0 || ite.type.compare("num")==0){
+					if(ite->right->right.type.compare("sym_math")==0){
+						ite->right = turnleft(ite->right);
+					}
+				}
+				if(regex_match(ite.value,"[/]|[*]|%") && regex_match(ite->right.value,"[-]|[+]")){
+					ite = turnleft(ite);
+				}else{
+						ite = ite->right;
+				}
+			}
+			if(ite->right.word.compare(";")==0){
+				ite = deleteNode(ite->right);
 			}
 		}
 	}
@@ -70,9 +142,10 @@ node* tree_setup(token* line, int row){
 	node* ite = root;
 	int i=0;
 	node* counterPos;
+	string opener = line[i];
 	while(!line[i].value.empty()){
 		ite = createNode(line[i++]);
-		if(ite.token.value.compare("(")==0){
+		if(ite.word.value.compare("(")==0){
 			node* counter = createNode(ite.token);
 			if(counterPos.token.value.empty()){
 				counterPos = counter;
@@ -83,7 +156,7 @@ node* tree_setup(token* line, int row){
 				counterPos = counterPos->right;
 			}
 		}
-		if(token.value.compare(")")==0){
+		if(ite.word.value.compare(")")==0){
 			if(counterPos->left == NULL){
 				delete counterPos;
 			}else{
@@ -100,6 +173,7 @@ node* tree_setup(token* line, int row){
 		exit(1);
 	}
 	delete counterPos;
+	setTree2(root);
 	return root;
 }
 /*node* setTree_helper(token* word, int i){

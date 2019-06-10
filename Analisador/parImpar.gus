@@ -2,15 +2,15 @@ proc main()
 {
 	var n,nRebuilt-int;
 
-	n := 51423;** numero a ser testado
+	n:=51423;**numero a ser testado
 
-	>> A divisao de interiro arredonda para baixo (em caso
+	>>A divisao de interiro arredonda para baixo (em caso
 		de divisao inexata). Assim, numeros impares ficarao
 		com uma unidade a menos do que seu valor iniciao <<
 
-	nRebuilt :=(n/2)*2;
+	nRebuilt:=(n/2)*2;
 	
-	if(n = nRebuilt)
+	if(n=nRebuilt)
 		prnt('P', 'A', 'R');
 	else
 		prnt('I','M','P','A','R');

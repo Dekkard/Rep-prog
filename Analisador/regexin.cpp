@@ -8,12 +8,14 @@
 
 using namespace std;
 
-regex regex_number("\\b[0-9]*,?[0-9]*(([Ee][-+])?[0-9]+)\\b");
-regex regex_keyword("\\b(if|else|while|return|float|char|void|prnt|int|and|or|not|proc|var|main)\\b");
-regex regex_symbols ("(?![0-9]),(?![0-9])|\\*\\*|<<|>>|!=|==|>=|<=|<|>|:=|:|;|=|[(]|[)]|[\"]|[{]|[}]");
-regex regex_math("[+]|[-]|[*]|[/]");
-regex regex_id("[a-z]([a-zA-z0-9])*");
-regex regex_string("['][a-zA-Z0-9]+[']");
+regex regex_number("[0-9]*,?[0-9]*(([Ee][-+])?[0-9]+)");
+//regex regex_int("[0-9]+");
+regex regex_keyword("\\b(if|else|while|return|float|char|void|prnt|int|and|or|not|e|proc|var|main)\\b");
+regex regex_symbols ("(?![0-9]),(?![0-9])|\\*\\*|:=|=|<<|>>|!=|==|:|;|\\(|\\)|[\"]|[{]|[}]");
+regex regex_op_rel(">=|<=|<|>");
+regex regex_op_math("[+]|[-]|[*]|[/]|%");
+regex regex_id("(?!')[a-z]([a-zA-Z_]|[0-9])*(?!')");
+regex regex_string("'([0-9]|[a-zA-Z]|\n|\t| |:|\\(|\\)|,)'");
 
 typedef struct posLine{
 	int pos;
@@ -28,7 +30,18 @@ typedef struct indLine{
 	int pos;
 	char status;
 } indLine;
-
+typedef struct regist{
+	string value;
+	string type;
+	struct regist* next;
+} regist;
+regist* createRegist(string value, string type){
+	regist *r = new regist;
+	r->value = value;
+	r->type = type;
+	r->next = NULL;
+	return r;
+}
 indLine lineComment;
 indBlock blockComment;
 
@@ -41,15 +54,57 @@ void reset_bc(){
 	lineComment.pos = -1;
 	lineComment.status = 'N';
 }
+regist* ids = new regist;
+int procFlag=0;
+void addRegEntry(regist* reg,string value, string type){
+	if(reg->value.empty()){ 
+		reg->value = value;
+		reg->type = type;
+		reg->next = NULL;
+	}
+	else{
+		while(reg->next != NULL ){
+			reg = reg->next;
+		}
+		reg->next = createRegist(value,type);
+	}
+}
 void printMatch_helper(token* lines, string line, regex reg, string type, int li){
+	regist *ids_ite = ids;
     sregex_iterator currentMatch(line.begin(),line.end(),reg);
     sregex_iterator lastMatch;
     while(currentMatch != lastMatch){
+    	token aux;
+    	aux.type = type;
         smatch match = *currentMatch;
 		if(type.compare("id")==0){
 			if(regex_match(match.str(),regex_keyword)){
 				currentMatch++;
 				continue;
+			}
+			smatch m;
+			while(regex_search(line,m,regex ("proc|var"))){
+				if(m.size() == 1 && procFlag == 0 && m.str().compare("proc")==0){
+					aux.type = "id_"+m.str();
+					if( m.str().compare("proc")==0) procFlag = 1;
+					addRegEntry(ids_ite,match.str(),"proc");
+					break;
+				}
+				else if(m.size() == 1 && (procFlag == 1 || m.str().compare("var")==0)){
+					aux.type = "id_var";
+					addRegEntry(ids_ite,match.str(),"var");
+					break;
+				}
+			}
+			if(m.empty()){
+				regist* ite = ids;
+				while(ite != NULL ){
+					if(ite->value == match.str()){
+						aux.type = type+"_"+ite->type;
+						break;
+					}
+					ite = ite->next;
+				}
 			}
 		}
 		if(type.compare("sym")==0){
@@ -79,21 +134,27 @@ void printMatch_helper(token* lines, string line, regex reg, string type, int li
 				continue;
 			}
 		}
-		if(match.position() > blockComment.start.pos && blockComment.status == 'S'){
-			if(blockComment.end.line < blockComment.start.line){
+		if(match.position() >= blockComment.start.pos && blockComment.status == 'S'){
+			if(blockComment.end.line <= blockComment.start.line){
 				currentMatch++;
 				continue;
 			} else {
-				if(match.position() < blockComment.end.pos){
+				if(match.position() <= blockComment.end.pos+1){
 					currentMatch++;
 					continue;
 		}}}
-		token aux;
+		if(regex_match(match.str(),regex ("[(]|[)]|:| |,")) && type.compare("sym")==0){
+			if(line[match.position()-1]=='\'' && line[match.position()+1]=='\''){
+				currentMatch++;
+				continue;
+			}
+		}
 		aux.value = match.str();
-		aux.type = type;
 		aux.len = match.length();
 		aux.pos = match.position();
-		if(match.str().compare(":=")==0){ aux.type+="_att";}
+		if(match.str().compare(":=")==0) aux.type += "_att";
+		if(match.str().compare("=")==0) aux.type += "_rel";
+		
 		lines[match.position()] = aux;
         //cout <<"-"<< match.str() <<"-(pos:"<< match.position() << "," << type << ") ";
 		currentMatch++;
@@ -101,11 +162,14 @@ void printMatch_helper(token* lines, string line, regex reg, string type, int li
 }
 token* printMatch(string line,int li){
 	token *lines = new token[sizeof(token)*line.length()];
+	    
 	printMatch_helper(lines,line,regex_symbols,"sym", li);
-	printMatch_helper(lines,line,regex_math,"math", li);
-	printMatch_helper(lines,line,regex_keyword,"key", li);
 	printMatch_helper(lines,line,regex_number,"num", li);
+	//printMatch_helper(lines,line,regex_int,"int", li);
+	printMatch_helper(lines,line,regex_op_rel,"sym_rel", li);
+	printMatch_helper(lines,line,regex_op_math,"sym_math", li);
 	printMatch_helper(lines,line,regex_id,"id", li);
+	printMatch_helper(lines,line,regex_keyword,"key", li);
 	printMatch_helper(lines,line,regex_string,"wrd", li);
 	if(blockComment.status == 'S'){
 		lineComment.pos = -1;
@@ -114,6 +178,7 @@ token* printMatch(string line,int li){
 	if(blockComment.end.pos > blockComment.start.pos && blockComment.end.line >= blockComment.start.line){
 		reset_bc();
 	}
+	if(procFlag == 1){ procFlag = 0;}
 	return lines;
 }
 token** Lex(string filename, int &rows){
@@ -167,7 +232,7 @@ void printProg(token** Program, int rows){
 		int j=0;
 		cout << "Linha "<<i+1<<":\t";
 		while(!Program[i][j].value.empty()){
-			cout << Program[i][j++].value << " ";
+			cout << Program[i][j].value <<":"<<Program[i][j++].type << " ";
 		}
 		cout << "" << endl;
 	}
