@@ -1,13 +1,4 @@
 var n, soma - int;
-
-proc main()
-{
-	var result - int;
-
-	result := soma(9)primeirosImpares();
-
-	prnt(result);
-}
 proc soma(n -int)primeirosImpares() - int
 {
 	var i, proxImpar, resultado - int;
@@ -23,3 +14,12 @@ proc soma(n -int)primeirosImpares() - int
 
 	return resultado;
 }
+proc main()
+{
+	var result - int;
+
+	result := soma(9)primeirosImpares();
+
+	prnt(result);
+}
+

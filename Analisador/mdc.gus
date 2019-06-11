@@ -24,5 +24,4 @@ proc main()
 	prnt(y);
 	prnt(')',':');
 	prnt(m);
-
 }

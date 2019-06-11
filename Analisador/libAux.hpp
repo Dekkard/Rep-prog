@@ -1,4 +1,6 @@
+#include <iostream>
 #include <string>
+#include <fstream>
 #include <stdlib.h>
 #include <regex>
 
@@ -12,8 +14,8 @@ typedef struct token{
 } token;
 typedef struct node{
     token word;
-    node* left;
-    node* right;
+    struct node* left;
+    struct node* right;
 } node;
 node* createNode(token data);
 node* turnLeft(node* node1);
