@@ -436,7 +436,7 @@ node* tree_setup(token* line, int row){
 	int i=0;
 	node* counterPos;
 	token opener = line[i];
-	if(opener.value.compare("id_var")==0){
+	if(opener.type.compare("id_var")==0){
 		while(!line[i].value.empty()){
 			ite = createNode(line[i++]);
 			if(ite->word.value.compare("(")==0){
@@ -507,12 +507,12 @@ node* tree_setup(token* line, int row){
 	if(opener.value.compare("proc")==0){
 		string oneliner = "";
 		while(!line[i].value.empty()){
-			if(line[i].value.compare("proc")==0||line[i].value.compare("int")==0||line[i].value.compare("float")==0||line[i].value.compare("char")==0||line[i].value.compare("-")==0||line[i].value.compare("(")==0||line[i].value.compare(")")==0)
+			if(line[i].value.compare("proc")==0||line[i].value.compare("int")==0||line[i].value.compare("float")==0||line[i].value.compare("char")==0||line[i].value.compare("-")==0||line[i].value.compare("(")==0||line[i].value.compare(")")==0||line[i].value.compare("main")==0)
 				{oneliner += line[i++].value;}
 			if(line[i].type.compare("id_var")==0||line[i].type.compare("id_proc")==0)
 				{oneliner += line[i++].type;}
 		}
-		regex regex_proc("procid_proc\\(id_var-(int|float|char)\\)(id_proc\\(id_var-(int|float|char)\\))+-(int|float|char)");
+		regex regex_proc("procid_proc\\(id_var|main-(int|float|char)\\)(id_proc\\(id_var-(int|float|char)\\))+-(int|float|char)");
 		if(regex_match(oneliner,regex_proc)){
 			ite->word = opener;
 			ite->left = NULL;
@@ -522,7 +522,7 @@ node* tree_setup(token* line, int row){
 	if(opener.value.compare("prnt")==0){
 		string oneliner = "";
 		while(!line[i].value.empty()){
-			if(line[i].value.compare("prnt")==0||line[i].value.compare(";")==0||line[i].value.compare("(")==0||line[i].value.compare(")")==0)
+			if(line[i].value.compare("prnt")==0||line[i].value.compare(";")==0||line[i].value.compare("(")==0||line[i].value.compare(")")==0||line[i].value.compare(",")==0)
 				{oneliner += line[i++].value;}
 			if(line[i].type.compare("id_var")==0||line[i].type.compare("wrd")==0||line[i].type.compare("num")==0)
 				{oneliner += line[i++].type;}
@@ -552,7 +552,7 @@ int main(int argc, char **argv)
 	reset_bc();
 	int rows;
 	token **Program = Lex(argv[1],rows);
-	Parse(Program,rows);
-    //printProg(Program,rows);
+	//Parse(Program,rows);
+    printProg(Program,rows);
 	return 0;
 }
