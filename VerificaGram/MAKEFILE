@@ -1,0 +1,12 @@
+all: exe
+
+exe: comp
+	./main $(a)
+
+comp: main.o
+	g++ -o main main.o
+main.o: main.cpp
+	g++ -std=c++11 -c -g main.cpp
+
+clean:
+	rm -rf *.o *~ main
