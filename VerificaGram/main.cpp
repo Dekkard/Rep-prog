@@ -82,5 +82,5 @@ int main(int argc, char **argv){
         word = argv[1];
     }
     string start = "S";
-    void verifyGrammarHelper(start, word){
+    verifyGrammarHelper(start, word);
 }
