@@ -20,63 +20,72 @@ void verifyGrammarHelper(string str, string word){
     while(currentMatch != lastMatch){
         smatch match = *currentMatch;
         string str_tmp;
-        if(match.str().compare("S")==0){
+        if(str.length() < word.length()+2){
+            if(match.str().compare("S")==0){
+                str_tmp = str;
+                str_tmp.replace(match.position(),1,"XY");
+                verifyGrammarHelper(str_tmp, word);
+            }else if(match.str().compare("X")==0){
+                str_tmp = str;
+                str_tmp.replace(match.position(),1,"XaA");
+                verifyGrammarHelper(str_tmp, word);
+                str_tmp = str;
+                str_tmp.replace(match.position(),1,"XbB");
+                verifyGrammarHelper(str_tmp, word);
+            }
+        }
+        if(match.str().compare("X")==0){
             str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"XY");
-        }else if(match.str().compare("X")==0){
-            str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"XaA");
-            verifyGrammarHelper(str_tmp, word);
-            str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"XbB");
-            verifyGrammarHelper(str_tmp, word);
-            str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"F");
+            str_tmp.replace(match.position(),1,"F");
             verifyGrammarHelper(str_tmp, word);
         }else if(match.str().compare("Aa")==0){
             str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"aA");
+            str_tmp.replace(match.position(),2,"aA");
             verifyGrammarHelper(str_tmp, word);
         }else if(match.str().compare("Ab")==0){
             str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"bA");
+            str_tmp.replace(match.position(),2,"bA");
             verifyGrammarHelper(str_tmp, word);
         }else if(match.str().compare("AY")==0){
             str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"Ya");
+            str_tmp.replace(match.position(),2,"Ya");
             verifyGrammarHelper(str_tmp, word);
         }else if(match.str().compare("Ba")==0){
             str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"aB");
+            str_tmp.replace(match.position(),2,"aB");
             verifyGrammarHelper(str_tmp, word);
         }else if(match.str().compare("Bb")==0){
             str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"bB");
+            str_tmp.replace(match.position(),2,"bB");
             verifyGrammarHelper(str_tmp, word);
         }else if(match.str().compare("BY")==0){
             str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"Yb");
+            str_tmp.replace(match.position(),2,"Yb");
             verifyGrammarHelper(str_tmp, word);
         }else if(match.str().compare("Fa")==0){
             str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"aF");
+            str_tmp.replace(match.position(),2,"aF");
             verifyGrammarHelper(str_tmp, word);
         }else if(match.str().compare("Fb")==0){
             str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"bF");
+            str_tmp.replace(match.position(),2,"bF");
             verifyGrammarHelper(str_tmp, word);
         }else if(match.str().compare("FY")==0){
             str_tmp = str;
-            str_tmp.replace(match.length(),match.position(),"");
+            str_tmp.replace(match.position(),2,"");
             verifyGrammarHelper(str_tmp, word);
         }
-        
+        str = str_tmp;
+        currentMatch++;
+    }
+    if(str.compare(word)==0){
+        cout << "String encontrada: "<< str << endl;
     }
 }
 int main(int argc, char **argv){
     string word;
     if(argv[1] == 0){
-        cout << "Digite uma word: " << endl;
+        cout << "Digite uma palavra: " << endl;
         cin >> word;
     }else{
         word = argv[1];

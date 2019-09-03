@@ -1,12 +1,12 @@
 all: exe
 
 exe: comp
-	./main $(a)
+	./verify $(a)
 
-comp: main.o
-	g++ -o main main.o
-main.o: main.cpp
-	g++ -std=c++11 -c -g main.cpp
+comp: verify.o
+	g++ -o verify verify.o
+verify.o: verify.cpp
+	g++ -std=c++11 -c -g verify.cpp
 
 clean:
-	rm -rf *.o *~ main
+	rm -rf *.o *~ verify
