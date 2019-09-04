@@ -14,6 +14,8 @@ using namespace std;
 
 regex alfa("a|b");
 regex rules("S|X|Aa|Ab|AY|Ba|Bb|bB|BY|Fa|Fb|FY");
+int end_f = 0;
+
 void verifyGrammarHelper(string str, string word){
     sregex_iterator currentMatch(str.begin(),str.end(),rules);
     sregex_iterator lastMatch;
@@ -77,9 +79,13 @@ void verifyGrammarHelper(string str, string word){
         }
         str = str_tmp;
         currentMatch++;
+        if(end_f==1){
+            return;
+        }
     }
     if(str.compare(word)==0){
         cout << "String encontrada: "<< str << endl;
+        end_f = 1;
     }
 }
 int main(int argc, char **argv){
@@ -92,4 +98,7 @@ int main(int argc, char **argv){
     }
     string start = "S";
     verifyGrammarHelper(start, word);
+    if(end_f==0){
+        cout << "Palavra não encontrada" << endl;
+    }
 }
