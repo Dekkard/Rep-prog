@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <fstream>
 #include <stdlib.h>
 #include <regex>
 /*
@@ -23,19 +22,21 @@ void verifyGrammarHelper(string str, string word, int lvl){
     sregex_iterator lastMatch;
     //cout<<counter_1<<">"<<str<<" lvl="<<lvl<<endl;
     while(currentMatch != lastMatch){
-        //cout<<" →"<<str<<endl;
+        //cout<<" ->"<<str<<endl;
         smatch match = *currentMatch;
-        string str_tmp;
+        string str_tmp = str;
         if(str.length() < word.length()+2){
             if(match.str().compare("S")==0){
-                str_tmp = str;
                 str_tmp.replace(match.position(),1,"XY");
-                verifyGrammarHelper(str_tmp, word,lvl+1);
+                verifyGrammarHelper(str_tmp, word, lvl+1);
             }else if(match.str().compare("X")==0){
-                str_tmp = str;
                 str_tmp.replace(match.position(),1,"XaA");
-                verifyGrammarHelper(str_tmp, word,lvl+1);
+                verifyGrammarHelper(str_tmp, word, lvl+1);
                 if(end_f==1){
+					if(lvl < lst_lvl){
+						path.insert(0,str+"->");
+						lst_lvl = lvl;
+					}
                     return;
                 }
                 str_tmp = str;
@@ -44,57 +45,55 @@ void verifyGrammarHelper(string str, string word, int lvl){
             }
         }
         if(match.str().compare("X")==0){
-            str_tmp = str;
             str_tmp.replace(match.position(),1,"F");
-            verifyGrammarHelper(str_tmp, word,lvl+1);
+            verifyGrammarHelper(str_tmp, word, lvl+1);
         }else if(match.str().compare("Aa")==0){
-            str_tmp = str;
             str_tmp.replace(match.position(),2,"aA");
-            verifyGrammarHelper(str_tmp, word,lvl+1);
+            verifyGrammarHelper(str_tmp, word, lvl+1);
         }else if(match.str().compare("Ab")==0){
-            str_tmp = str;
             str_tmp.replace(match.position(),2,"bA");
-            verifyGrammarHelper(str_tmp, word,lvl+1);
+            verifyGrammarHelper(str_tmp, word, lvl+1);
         }else if(match.str().compare("AY")==0){
-            str_tmp = str;
             str_tmp.replace(match.position(),2,"Ya");
-            verifyGrammarHelper(str_tmp, word,lvl+1);
+            verifyGrammarHelper(str_tmp, word, lvl+1);
         }else if(match.str().compare("Ba")==0){
-            str_tmp = str;
             str_tmp.replace(match.position(),2,"aB");
-            verifyGrammarHelper(str_tmp, word,lvl+1);
+            verifyGrammarHelper(str_tmp, word, lvl+1);
         }else if(match.str().compare("Bb")==0){
-            str_tmp = str;
             str_tmp.replace(match.position(),2,"bB");
-            verifyGrammarHelper(str_tmp, word,lvl+1);
+            verifyGrammarHelper(str_tmp, word, lvl+1);
         }else if(match.str().compare("BY")==0){
-            str_tmp = str;
             str_tmp.replace(match.position(),2,"Yb");
-            verifyGrammarHelper(str_tmp, word,lvl+1);
+            verifyGrammarHelper(str_tmp, word, lvl+1);
         }else if(match.str().compare("Fa")==0){
-            str_tmp = str;
             str_tmp.replace(match.position(),2,"aF");
-            verifyGrammarHelper(str_tmp, word,lvl+1);
+            verifyGrammarHelper(str_tmp, word, lvl+1);
         }else if(match.str().compare("Fb")==0){
-            str_tmp = str;
             str_tmp.replace(match.position(),2,"bF");
-            verifyGrammarHelper(str_tmp, word,lvl+1);
+            verifyGrammarHelper(str_tmp, word, lvl+1);
         }else if(match.str().compare("FY")==0){
-            str_tmp = str;
             str_tmp.replace(match.position(),2,"");
-            verifyGrammarHelper(str_tmp, word,lvl+1);
+            verifyGrammarHelper(str_tmp, word, lvl+1);
         }
         str = str_tmp;
         //cout << str << " : " << counter_1 << endl;
         if(end_f==1){
+			if(lvl < lst_lvl){
+				path.insert(0,str+"->");
+				lst_lvl = lvl;
+			}
             return;
         }//else{cout<<"----------lvl="<<lvl<<endl;}
         currentMatch++;
     }
-    if(str.compare(word)==0){
+    if(str.compare(word)==0 && end_f != 1){
         cout << "String encontrada: "<< str << endl;
         end_f = 1;
-    }else{counter_1++;}
+		path += str;
+		lst_lvl = lvl-1;
+    }else{
+		//cout<<"====="<<endl;
+	}
 }
 int main(int argc, char **argv){
     string word;
